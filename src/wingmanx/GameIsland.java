@@ -8,13 +8,13 @@ import java.util.Random;
  *
  * @author markfavis
  */
-public class Island {
+public class GameIsland {
 
     Image img;
     int x, y, speed;
     Random gen;
 
-    Island(Image img, int x, int y, int speed, Random gen) {
+    GameIsland(Image img, int x, int y, int speed, Random gen) {
         this.img = img;
         this.x = x;
         this.y = y;

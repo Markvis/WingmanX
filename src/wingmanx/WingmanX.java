@@ -31,16 +31,12 @@ public class WingmanX extends JApplet implements Runnable {
     static Graphics2D g2;
     int speed = 1, move = 0;
     static Random generator = new Random(1234567);
-    Island I1, I2, I3;
-    static MyPlane m;
+    GameIsland I1, I2, I3;
+    static GamePlayer m;
     static final int w = 640, h = 480; // fixed size window game 
-    Enemy e1;
+    GameEnemy e1;
     static GameEvents gameEvents;
-    InputStream backgroudMusic;
-    
-    public int getH(){
-        return h;
-    }
+    //InputStream backgroudMusic;
     
     public void init() {
 
@@ -56,15 +52,15 @@ public class WingmanX extends JApplet implements Runnable {
             myPlane = ImageIO.read(new File("Resources/myplane_1.png"));
             enemyImg = ImageIO.read(new File("Resources/enemy1_1.png"));
 
-            I1 = new Island(island1, 100, 100, speed, generator);
-            I2 = new Island(island2, 200, 400, speed, generator);
-            I3 = new Island(island3, 300, 200, speed, generator);
-            e1 = new Enemy(enemyImg, 1, generator);
-            m = new MyPlane(myPlane, 300, 360, 5);
+            I1 = new GameIsland(island1, 100, 100, speed, generator);
+            I2 = new GameIsland(island2, 200, 400, speed, generator);
+            I3 = new GameIsland(island3, 300, 200, speed, generator);
+            e1 = new GameEnemy(enemyImg, 1, generator);
+            m = new GamePlayer(myPlane, 300, 360, 5);
             
-            backgroudMusic = new FileInputStream(new File("Resources/background.mid"));
-            AudioStream in = new AudioStream(backgroudMusic);
-            AudioPlayer.player.start(in);
+            InputStream backgroundMusicPath = new FileInputStream(new File("Resources/background.mid"));
+            AudioStream backgroundMusic = new AudioStream(backgroundMusicPath);
+            AudioPlayer.player.start(backgroundMusic);
 
             gameEvents = new GameEvents();
             gameEvents.addObserver(m);
@@ -97,78 +93,6 @@ public class WingmanX extends JApplet implements Runnable {
             notifyObservers(this);
         }
     }
-    
-//    public class Island {
-//
-//        Image img;
-//        int x, y, speed;
-//        Random gen;
-//
-//        Island(Image img, int x, int y, int speed, Random gen) {
-//            this.img = img;
-//            this.x = x;
-//            this.y = y;
-//            this.speed = speed;
-//            this.gen = gen;
-//        }
-//
-//        public void update() {
-//            y += speed;
-//            if (y >= h) {
-//                y = -100;
-//                x = Math.abs(gen.nextInt() % (w - 30));
-//            }
-//        }
-//
-//        public void draw(ImageObserver obs) {
-//            g2.drawImage(img, x, y, obs);
-//        }
-//    }
-
-//    public class Enemy {
-//
-//        Image img;
-//        int x, y, sizeX, sizeY, speed;
-//        Random gen;
-//        boolean show;
-//
-//        Enemy(Image img, int speed, Random gen) {
-//            this.img = img;
-//            this.x = Math.abs(gen.nextInt() % (600 - 30));
-//            this.y = -20;
-//            this.speed = speed;
-//            this.gen = gen;
-//            this.show = true;
-//            sizeX = img.getWidth(null);
-//            sizeY = img.getHeight(null);
-//            System.out.println("w:" + sizeX + " y:" + sizeY);
-//        }
-//
-//        public void update() {
-//            y += speed;
-//            if (m.collision(x, y, sizeX, sizeY)) {
-//                show = false;
-//                // You need to remove this one and increase score etc
-//                gameEvents.setValue("Explosion");
-//                gameEvents.setValue("");
-//                this.reset();
-//                show = true;
-//            } else {
-//                gameEvents.setValue("");
-//            }
-//        }
-//
-//        public void reset() {
-//            this.x = Math.abs(generator.nextInt() % (600 - 30));
-//            this.y = -10;
-//        }
-//
-//        public void draw(ImageObserver obs) {
-//            if (show) {
-//                g2.drawImage(img, x, y, obs);
-//            }
-//        }
-//    }
 
     public class KeyControl extends KeyAdapter {
 
@@ -176,69 +100,6 @@ public class WingmanX extends JApplet implements Runnable {
             gameEvents.setValue(e);
         }
     }
-
-//    public class MyPlane implements Observer {
-//
-//        Image img;
-//        int x, y, speed, width, height;
-//        Rectangle bbox;
-//        boolean boom;
-//        int health;
-//
-//        MyPlane(Image img, int x, int y, int speed) {
-//            this.img = img;
-//            this.x = x;
-//            this.y = y;
-//            this.speed = speed;
-//            width = img.getWidth(null);
-//            height = img.getHeight(null);
-//            boom = false;
-//            setFocusable(true);
-//        }
-//
-//        public void draw(ImageObserver obs) {
-//            g2.drawImage(img, x, y, obs);
-//        }
-//
-//        public boolean collision(int x, int y, int w, int h) {
-//            bbox = new Rectangle(this.x, this.y, this.width, this.height);
-//            Rectangle otherBBox = new Rectangle(x, y, w, h);
-//            if (this.bbox.intersects(otherBBox)) {
-//                return true;
-//            }
-//            return false;
-//        }
-//
-//        public void update(Observable obj, Object arg) {
-//            GameEvents ge = (GameEvents) arg;
-//            if (ge.type == 1) {
-//                KeyEvent e = (KeyEvent) ge.event;
-//                switch (e.getKeyCode()) {
-//                    case KeyEvent.VK_LEFT:
-//                        x -= speed;
-//                        break;
-//                    case KeyEvent.VK_RIGHT:
-//                        x += speed;
-//                        break;
-//                    case KeyEvent.VK_UP:
-//                        y -= speed;
-//                        break;
-//                    case KeyEvent.VK_DOWN:
-//                        y += speed;
-//                        break;
-//                    default:
-//                        if (e.getKeyChar() == ' ') {
-//                            System.out.println("Fire");
-//                        }
-//                }
-//            } else if (ge.type == 2) {
-//                String msg = (String) ge.event;
-//                if (msg.equals("Explosion")) {
-//                    System.out.println("Explosion! Reduce Health");
-//                }
-//            }
-//        }
-//    }
 
     public void drawBackGroundWithTileImage() {
         int TileWidth = sea.getWidth(this);

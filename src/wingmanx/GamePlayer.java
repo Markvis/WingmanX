@@ -11,13 +11,12 @@ import java.awt.event.KeyEvent;
 import java.awt.image.ImageObserver;
 import java.util.Observable;
 import java.util.Observer;
-import static wingmanx.WingmanX.g2;
 
 /**
  *
  * @author markfavis
  */
-public class MyPlane implements Observer {
+public class GamePlayer implements Observer {
 
     Image img;
     int x, y, speed, width, height;
@@ -25,7 +24,7 @@ public class MyPlane implements Observer {
     boolean boom;
     int health;
 
-    MyPlane(Image img, int x, int y, int speed) {
+    GamePlayer(Image img, int x, int y, int speed) {
         this.img = img;
         this.x = x;
         this.y = y;
@@ -33,11 +32,11 @@ public class MyPlane implements Observer {
         width = img.getWidth(null);
         height = img.getHeight(null);
         boom = false;
-        //this.setFocusable(true);
+        health = 3;
     }
 
     public void draw(ImageObserver obs) {
-        g2.drawImage(img, x, y, obs);
+        WingmanX.g2.drawImage(img, x, y, obs);
     }
 
     public boolean collision(int x, int y, int w, int h) {
@@ -74,7 +73,8 @@ public class MyPlane implements Observer {
         } else if (ge.type == 2) {
             String msg = (String) ge.event;
             if (msg.equals("Explosion")) {
-                System.out.println("Explosion! Reduce Health");
+                health--;
+                System.out.println("Got hit, player hp: " + health);
             }
         }
     }

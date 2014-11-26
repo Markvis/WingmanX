@@ -8,20 +8,20 @@ package wingmanx;
 import java.awt.Image;
 import java.awt.image.ImageObserver;
 import java.util.Random;
-import static wingmanx.WingmanX.g2;
 
 /**
  *
  * @author markfavis
  */
-public class Enemy {
+public class GameEnemy {
 
     Image img;
     int x, y, sizeX, sizeY, speed;
     Random gen;
     boolean show;
+    int health;
 
-    Enemy(Image img, int speed, Random gen) {
+    GameEnemy(Image img, int speed, Random gen) {
         this.img = img;
         this.x = Math.abs(gen.nextInt() % (600 - 30));
         this.y = -20;
@@ -54,7 +54,7 @@ public class Enemy {
 
     public void draw(ImageObserver obs) {
         if (show) {
-            g2.drawImage(img, x, y, obs);
+            WingmanX.g2.drawImage(img, x, y, obs);
         }
     }
 }
