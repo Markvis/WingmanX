@@ -23,6 +23,7 @@ public class GamePlayer implements Observer {
     Rectangle bbox;
     boolean boom;
     int health;
+    static int sensitivity = 15;
 
     GamePlayer(Image img, int x, int y, int speed) {
         this.img = img;
@@ -54,16 +55,16 @@ public class GamePlayer implements Observer {
             KeyEvent e = (KeyEvent) ge.event;
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT:
-                    x -= speed;
+                    x -= speed + sensitivity;
                     break;
                 case KeyEvent.VK_RIGHT:
-                    x += speed;
+                    x += speed + sensitivity;
                     break;
                 case KeyEvent.VK_UP:
-                    y -= speed;
+                    y -= speed + sensitivity;
                     break;
                 case KeyEvent.VK_DOWN:
-                    y += speed;
+                    y += speed + sensitivity;
                     break;
                 default:
                     if (e.getKeyChar() == ' ') {

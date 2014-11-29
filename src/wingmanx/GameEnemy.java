@@ -7,7 +7,12 @@ package wingmanx;
 
 import java.awt.Image;
 import java.awt.image.ImageObserver;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Random;
+import sun.audio.AudioPlayer;
+import sun.audio.AudioStream;
 
 /**
  *
@@ -20,7 +25,12 @@ public class GameEnemy {
     Random gen;
     boolean show;
     int health;
-
+/**
+ * 
+ * @param img the image to be drawn for the enemy class
+ * @param speed the speed of the enemy
+ * @param gen random number generated of the spawn point
+ */
     GameEnemy(Image img, int speed, Random gen) {
         this.img = img;
         this.x = Math.abs(gen.nextInt() % (600 - 30));
@@ -40,9 +50,20 @@ public class GameEnemy {
             // You need to remove this one and increase score etc
             WingmanX.gameEvents.setValue("Explosion");
             WingmanX.gameEvents.setValue("");
+            try {
+                InputStream backgroundMusicPath = new FileInputStream(new File("Resources/snd_explosion2.wav"));
+                AudioStream backgroundMusic = new AudioStream(backgroundMusicPath);
+                AudioPlayer.player.start(backgroundMusic);
+            } catch (Exception e) {
+                System.out.println("Error accessing explosion sound file");
+            }
             this.reset();
             show = true;
-        } else {
+        }
+        else if(y > WingmanX.h){
+            this.reset();
+        }
+        else {
             WingmanX.gameEvents.setValue("");
         }
     }
@@ -50,6 +71,7 @@ public class GameEnemy {
     public void reset() {
         this.x = Math.abs(WingmanX.generator.nextInt() % (600 - 30));
         this.y = -10;
+        //this.speed += 1;
     }
 
     public void draw(ImageObserver obs) {

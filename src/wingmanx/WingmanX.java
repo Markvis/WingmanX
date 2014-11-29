@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import sun.audio.AudioPlayer;
@@ -21,7 +22,6 @@ import sun.audio.AudioStream;
  *
  * @author markfavis
  */
-
 public class WingmanX extends JApplet implements Runnable {
 
     private Thread thread;
@@ -30,16 +30,17 @@ public class WingmanX extends JApplet implements Runnable {
     private BufferedImage bimg;
     static Graphics2D g2;
     int speed = 1, move = 0;
-    static Random generator = new Random(1234567);
+    static Random generator = new Random();
     GameIsland I1, I2, I3;
     static GamePlayer m;
     static final int w = 640, h = 480; // fixed size window game 
-    GameEnemy e1;
     static GameEvents gameEvents;
-    //InputStream backgroudMusic;
-    
+    ArrayList<GameEnemy> enemies;
+    long time;
+
     public void init() {
 
+        time = System.nanoTime();
         setBackground(Color.white);
         Image island1, island2, island3, enemyImg;
 
@@ -55,9 +56,15 @@ public class WingmanX extends JApplet implements Runnable {
             I1 = new GameIsland(island1, 100, 100, speed, generator);
             I2 = new GameIsland(island2, 200, 400, speed, generator);
             I3 = new GameIsland(island3, 300, 200, speed, generator);
-            e1 = new GameEnemy(enemyImg, 1, generator);
             m = new GamePlayer(myPlane, 300, 360, 5);
-            
+
+            // create 3 enemies
+            enemies = new ArrayList<GameEnemy>();
+            for (int i = 0; i < 3; i++) {
+                enemies.add(new GameEnemy(enemyImg, 1, generator));
+            }
+
+            // generate background audio
             InputStream backgroundMusicPath = new FileInputStream(new File("Resources/background.mid"));
             AudioStream backgroundMusic = new AudioStream(backgroundMusicPath);
             AudioPlayer.player.start(backgroundMusic);
@@ -123,13 +130,17 @@ public class WingmanX extends JApplet implements Runnable {
         I1.update();
         I2.update();
         I3.update();
-        e1.update();
+        for (int i = 0; i < enemies.size(); i++) {
+            enemies.get(i).update();
+        }
 
         I1.draw(this);
         I2.draw(this);
         I3.draw(this);
         m.draw(this);
-        e1.draw(this);
+        for (int i = 0; i < enemies.size(); i++) {
+            enemies.get(i).draw(this);
+        }
     }
 
     public void paint(Graphics g) {
@@ -167,7 +178,7 @@ public class WingmanX extends JApplet implements Runnable {
     public static void main(String argv[]) {
         final WingmanX game = new WingmanX();
         game.init();
-        JFrame f = new JFrame("Wingman");
+        JFrame f = new JFrame("WingmanX");
         f.addWindowListener(new WindowAdapter() {
         });
         f.getContentPane().add("Center", game);
