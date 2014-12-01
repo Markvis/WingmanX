@@ -17,6 +17,9 @@ import java.util.Observable;
 import java.util.Observer;
 import sun.audio.AudioPlayer;
 import sun.audio.AudioStream;
+import javax.swing.Timer;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  *
@@ -28,6 +31,9 @@ public class WingmanX extends JApplet implements Runnable {
     Image sea;
     Image playerOneImg;
     Image playerTwoImg;
+    Image playerBullet;
+    Image enemyBullet;
+    Image bossImg;
     private BufferedImage bimg;
     static Graphics2D g2;
     int speed = 1, move = 0;
@@ -37,18 +43,21 @@ public class WingmanX extends JApplet implements Runnable {
     static GamePlayer playerTwo;
     static final int w = 640, h = 480; // fixed size window game 
     static GameEvents gameEvents;
-    ArrayList<GameEnemy> smallEnemies;
-    long time;
+    static ArrayList<GameEnemy> smallEnemies;
     static HealthBar playerOneHealth;
     static HealthBar playerTwoHealth;
+    static ArrayList<GameBullets> playerBullets;
+    static ArrayList<GameBullets> enemyBullets;
+    static GameEnemy boss;
+    Timer gameTimer;
 
     public void init() {
 
-        time = System.nanoTime();
         setBackground(Color.white);
         Image island1, island2, island3, smallEnemyImg;
 
         try {
+            gameTimer = new Timer(1000, new gameTimerClass());
             //sea = getSprite("Resources/water.png");
             sea = ImageIO.read(new File("Resources/water.png"));
             island1 = ImageIO.read(new File("Resources/island1.png"));
@@ -57,35 +66,77 @@ public class WingmanX extends JApplet implements Runnable {
             playerOneImg = ImageIO.read(new File("Resources/myplane_1.png"));
             playerTwoImg = ImageIO.read(new File("Resources/myplane_2.png"));
             smallEnemyImg = ImageIO.read(new File("Resources/enemy1_1.png"));
+            playerBullet = ImageIO.read(new File("Resources/bullet.png"));
+            enemyBullet = ImageIO.read(new File("Resources/enemybullet1.png"));
+            bossImg = ImageIO.read(new File("Resources/boss.png"));
 
             I1 = new GameIsland(island1, 100, 100, speed, generator);
             I2 = new GameIsland(island2, 200, 400, speed, generator);
             I3 = new GameIsland(island3, 300, 200, speed, generator);
+            
+            // create array of player bullets
+            playerBullets = new ArrayList<GameBullets>();
+            for (int i = 0; i < 20; i++) {
+                playerBullets.add(new GameBullets(playerBullet, -5));
+            }
+            // create array of enemy bullets
+            enemyBullets = new ArrayList<GameBullets>();
+            for (int i = 0; i < 20; i++) {
+                enemyBullets.add(new GameBullets(enemyBullet, 4));
+            }
+            
+            // create 5 enemies
+            smallEnemies = new ArrayList<GameEnemy>();
+            for (int i = 0; i < 5; i++) {
+                smallEnemies.add(new GameEnemy(smallEnemyImg, 2, generator));
+            }
+            
+            // initialize boss
+//            boss = new GameEnemy(bossImg, 1, generator);
+//            boss.x = w/2 - 240/2;
+//            boss.show = true;
+//            boss.spawned = true;
+            
             playerOne = new GamePlayer(playerOneImg, 200, 360, 5, 1);
             playerTwo = new GamePlayer(playerTwoImg, 400, 360, 5, 2);
             
-            playerOneHealth = new HealthBar(5, 420, 3);
-            playerTwoHealth = new HealthBar(515, 420, 3);
-
-            // create 3 enemies
-            smallEnemies = new ArrayList<GameEnemy>();
-            for (int i = 0; i < 5; i++) {
-                smallEnemies.add(new GameEnemy(smallEnemyImg, 1, generator));
-            }
+            playerOneHealth = new HealthBar(5, 420, 4);
+            playerTwoHealth = new HealthBar(419, 420, 4);
 
             // generate background audio
 //            InputStream backgroundMusicPath = new FileInputStream(new File("Resources/background.mid"));
 //            AudioStream backgroundMusic = new AudioStream(backgroundMusicPath);
 //            AudioPlayer.player.start(backgroundMusic);
-
+            
             gameEvents = new GameEvents();
             gameEvents.addObserver(playerOne);
             gameEvents.addObserver(playerTwo);
             KeyControl key = new KeyControl();
             addKeyListener(key);
+            
+            gameTimer.start();
         } catch (Exception e) {
             System.out.print("No resources are found");
         }
+    }
+    
+    public static void explosionSound1(){
+        try {
+            InputStream backgroundMusicPath = new FileInputStream(new File("Resources/snd_explosion1.wav"));
+            AudioStream explosionSound = new AudioStream(backgroundMusicPath);
+            AudioPlayer.player.start(explosionSound);
+        } catch (Exception e) {
+            System.out.println("Error accessing explosion sound file");
+        } 
+    }
+    public static void explosionSound2(){
+        try {
+            InputStream backgroundMusicPath = new FileInputStream(new File("Resources/snd_explosion2.wav"));
+            AudioStream explosionSound = new AudioStream(backgroundMusicPath);
+            AudioPlayer.player.start(explosionSound);
+        } catch (Exception e) {
+            System.out.println("Error accessing explosion sound file");
+        } 
     }
 
     public void drawBackGroundWithTileImage() {
@@ -114,17 +165,42 @@ public class WingmanX extends JApplet implements Runnable {
         for (int i = 0; i < smallEnemies.size(); i++) {
             smallEnemies.get(i).update();
         }
+        
+        // update player bullets
+        for (int i = 0; i < playerBullets.size(); i++) {
+            playerBullets.get(i).update();
+        }
+        
+        // update enemy bullets
+        for (int i = 0; i < enemyBullets.size(); i++) {
+            enemyBullets.get(i).update();
+        }
 
+        // draw islands
         I1.draw(this);
         I2.draw(this);
         I3.draw(this);
-        // draw players
-        playerOne.draw(this);
-        playerTwo.draw(this);
+        
+        //boss.draw(this);
+        
+        // draw fired player bullets
+        for (int i = 0; i < playerBullets.size(); i++) {
+            playerBullets.get(i).draw(this);
+        }
+
+        // draw fired enemy bullets
+        for (int i = 0; i < enemyBullets.size(); i++) {
+            enemyBullets.get(i).draw(this);
+        }
+        
         // draw enemies
         for (int i = 0; i < smallEnemies.size(); i++) {
             smallEnemies.get(i).draw(this);
         }
+        
+        // draw players
+        playerOne.draw(this);
+        playerTwo.draw(this);
         
         //draw health bars
         playerOneHealth.draw(this);

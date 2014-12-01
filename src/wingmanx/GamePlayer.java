@@ -9,8 +9,13 @@ import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.image.ImageObserver;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Observable;
 import java.util.Observer;
+import sun.audio.AudioPlayer;
+import sun.audio.AudioStream;
 
 /**
  *
@@ -51,44 +56,77 @@ public class GamePlayer implements Observer {
 
     public void update(Observable obj, Object arg) {
         GameEvents ge = (GameEvents) arg;
+
+        for (int i = 0; i < WingmanX.enemyBullets.size(); i++) {
+            if (WingmanX.enemyBullets.get(i).collision(x, y, width, height)
+                    && WingmanX.enemyBullets.get(i).show == true) {
+                if (this.playerNumber == 1) {
+                    WingmanX.playerOneHealth.update();
+                }
+                if (this.playerNumber == 2) {
+                    WingmanX.playerTwoHealth.update();
+                }
+                WingmanX.explosionSound1();
+                WingmanX.enemyBullets.get(i).reset();
+            }
+        }
+
         if (playerNumber == 1 && ge.type == 1) {
             KeyEvent e = (KeyEvent) ge.event;
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT:
-                    x -= speed + sensitivity;
+                    if (x > 0) {
+                        x -= speed + sensitivity;
+                    }
                     break;
                 case KeyEvent.VK_RIGHT:
-                    x += speed + sensitivity;
+                    if (x < WingmanX.w - width) {
+                        x += speed + sensitivity;
+                    }
                     break;
                 case KeyEvent.VK_UP:
-                    y -= speed + sensitivity;
+                    if (y > 0) {
+                        y -= speed + sensitivity;
+                    }
                     break;
                 case KeyEvent.VK_DOWN:
-                    y += speed + sensitivity;
+                    if (y < WingmanX.h - height - 20) {
+                        y += speed + sensitivity;
+                    }
                     break;
                 default:
                     if (e.getKeyChar() == '/') {
-                        System.out.println("Fire");
+                        fire();
+                        System.out.println("player 1 Fire");
                     }
             }
         } else if (playerNumber == 2 && ge.type == 1) {
             KeyEvent e = (KeyEvent) ge.event;
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_A:
-                    x -= speed + sensitivity;
+                    if (x > 0) {
+                        x -= speed + sensitivity;
+                    }
                     break;
                 case KeyEvent.VK_D:
-                    x += speed + sensitivity;
+                    if (x < WingmanX.w - width) {
+                        x += speed + sensitivity;
+                    }
                     break;
                 case KeyEvent.VK_W:
-                    y -= speed + sensitivity;
+                    if (y > 0) {
+                        y -= speed + sensitivity;
+                    }
                     break;
                 case KeyEvent.VK_S:
-                    y += speed + sensitivity;
+                    if (y < WingmanX.h - height - 20) {
+                        y += speed + sensitivity;
+                    }
                     break;
                 default:
                     if (e.getKeyChar() == ' ') {
-                        System.out.println("Fire");
+                        fire();
+                        System.out.println("player 2 Fire");
                     }
             }
         } else if (ge.type == 2) {
@@ -98,9 +136,20 @@ public class GamePlayer implements Observer {
                     System.out.println("Player 1 hit!");
                     break;
                 case "Explosion player 2":
-                    System.out.println("Player 2 hit!"); 
+                    System.out.println("Player 2 hit!");
                     break;
             }
-        } 
+        }
+    }
+
+    public void fire() {
+        for (int i = 0; i < WingmanX.playerBullets.size(); i++) {
+            if (WingmanX.playerBullets.get(i).show == false) {
+                WingmanX.playerBullets.get(i).show = true;
+                WingmanX.playerBullets.get(i).x = this.x + 16;
+                WingmanX.playerBullets.get(i).y = this.y + 16;
+                break;
+            }
+        }
     }
 }

@@ -33,4 +33,10 @@ public class GameEvents extends Observable {
         // trigger notification
         notifyObservers(this);
     }
+    
+    public void gameOver(){
+        type = 3;
+        setChanged();
+        notifyObservers(this);
+    }
 }

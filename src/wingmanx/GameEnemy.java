@@ -23,7 +23,7 @@ public class GameEnemy {
     Image img;
     int x, y, sizeX, sizeY, speed;
     Random gen;
-    boolean show;
+    boolean show, spawned;
     int health;
 
     /**
@@ -38,61 +38,78 @@ public class GameEnemy {
         this.y = -20;
         this.speed = speed;
         this.gen = gen;
-        this.show = true;
+        this.show = false;
+        this.spawned = false;
         sizeX = img.getWidth(null);
         sizeY = img.getHeight(null);
         System.out.println("w:" + sizeX + " y:" + sizeY);
     }
 
     public void update() {
-        y += speed;
+        if (show && spawned) {
+            y += speed;
+        }
+
+        // check if theres collision on the visible bullets
+        for (GameBullets playerBullet : WingmanX.playerBullets) {
+            if (playerBullet.collision(x, y, sizeX, sizeY) && playerBullet.show == true) {
+                show = false;
+                WingmanX.explosionSound2();
+                playerBullet.reset();
+                this.reset();
+                show = true;
+            }
+        }
+
+        // check player one and two collisions
         if (WingmanX.playerOne.collision(x, y, sizeX, sizeY)) {
             show = false;
             // You need to remove this one and increase score etc
             WingmanX.gameEvents.setValue("Explosion player 1");
             WingmanX.gameEvents.setValue("");
-            try {
-                InputStream backgroundMusicPath = new FileInputStream(new File("Resources/snd_explosion2.wav"));
-                AudioStream backgroundMusic = new AudioStream(backgroundMusicPath);
-                AudioPlayer.player.start(backgroundMusic);
-            } catch (Exception e) {
-                System.out.println("Error accessing explosion sound file");
-            }
+            WingmanX.explosionSound1();
             this.reset();
             show = true;
             WingmanX.playerOneHealth.update();
-        }
-        else if(WingmanX.playerTwo.collision(x, y, sizeX, sizeY)){
+        } else if (WingmanX.playerTwo.collision(x, y, sizeX, sizeY)) {
             show = false;
             // You need to remove this one and increase score etc
             WingmanX.gameEvents.setValue("Explosion player 2");
             WingmanX.gameEvents.setValue("");
-            try {
-                InputStream backgroundMusicPath = new FileInputStream(new File("Resources/snd_explosion2.wav"));
-                AudioStream backgroundMusic = new AudioStream(backgroundMusicPath);
-                AudioPlayer.player.start(backgroundMusic);
-            } catch (Exception e) {
-                System.out.println("Error accessing explosion sound file");
-            }
+            WingmanX.explosionSound1();
             this.reset();
             show = true;
             WingmanX.playerTwoHealth.update();
-        }
+        } // if enemy goes past frame, reset it
         else if (y > WingmanX.h) {
             this.reset();
-        } else {
+        } // reset gameevents value
+        else {
             WingmanX.gameEvents.setValue("");
         }
     }
 
     public void reset() {
+        this.show = false;
+        this.spawned = false;
         this.x = Math.abs(WingmanX.generator.nextInt() % (600 - 30));
         this.y = -10;
     }
 
     public void draw(ImageObserver obs) {
-        if (show) {
+        if (show && spawned) {
             WingmanX.g2.drawImage(img, x, y, obs);
+        }
+    }
+
+    public void fire() {
+        for (GameBullets enemyBullet : WingmanX.enemyBullets) {
+            if (enemyBullet.show == false) {
+                enemyBullet.show = true;
+                enemyBullet.x = this.x + 2;
+                enemyBullet.y = this.y + 8;
+                break;
+            }
         }
     }
 }
