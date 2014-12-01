@@ -26,23 +26,27 @@ public class WingmanX extends JApplet implements Runnable {
 
     private Thread thread;
     Image sea;
-    Image myPlane;
+    Image playerOneImg;
+    Image playerTwoImg;
     private BufferedImage bimg;
     static Graphics2D g2;
     int speed = 1, move = 0;
     static Random generator = new Random();
     GameIsland I1, I2, I3;
-    static GamePlayer m;
+    static GamePlayer playerOne;
+    static GamePlayer playerTwo;
     static final int w = 640, h = 480; // fixed size window game 
     static GameEvents gameEvents;
-    ArrayList<GameEnemy> enemies;
+    ArrayList<GameEnemy> smallEnemies;
     long time;
+    static HealthBar playerOneHealth;
+    static HealthBar playerTwoHealth;
 
     public void init() {
 
         time = System.nanoTime();
         setBackground(Color.white);
-        Image island1, island2, island3, enemyImg;
+        Image island1, island2, island3, smallEnemyImg;
 
         try {
             //sea = getSprite("Resources/water.png");
@@ -50,61 +54,37 @@ public class WingmanX extends JApplet implements Runnable {
             island1 = ImageIO.read(new File("Resources/island1.png"));
             island2 = ImageIO.read(new File("Resources/island2.png"));
             island3 = ImageIO.read(new File("Resources/island3.png"));
-            myPlane = ImageIO.read(new File("Resources/myplane_1.png"));
-            enemyImg = ImageIO.read(new File("Resources/enemy1_1.png"));
+            playerOneImg = ImageIO.read(new File("Resources/myplane_1.png"));
+            playerTwoImg = ImageIO.read(new File("Resources/myplane_2.png"));
+            smallEnemyImg = ImageIO.read(new File("Resources/enemy1_1.png"));
 
             I1 = new GameIsland(island1, 100, 100, speed, generator);
             I2 = new GameIsland(island2, 200, 400, speed, generator);
             I3 = new GameIsland(island3, 300, 200, speed, generator);
-            m = new GamePlayer(myPlane, 300, 360, 5);
+            playerOne = new GamePlayer(playerOneImg, 200, 360, 5, 1);
+            playerTwo = new GamePlayer(playerTwoImg, 400, 360, 5, 2);
+            
+            playerOneHealth = new HealthBar(5, 420, 3);
+            playerTwoHealth = new HealthBar(515, 420, 3);
 
             // create 3 enemies
-            enemies = new ArrayList<GameEnemy>();
-            for (int i = 0; i < 3; i++) {
-                enemies.add(new GameEnemy(enemyImg, 1, generator));
+            smallEnemies = new ArrayList<GameEnemy>();
+            for (int i = 0; i < 5; i++) {
+                smallEnemies.add(new GameEnemy(smallEnemyImg, 1, generator));
             }
 
             // generate background audio
-            InputStream backgroundMusicPath = new FileInputStream(new File("Resources/background.mid"));
-            AudioStream backgroundMusic = new AudioStream(backgroundMusicPath);
-            AudioPlayer.player.start(backgroundMusic);
+//            InputStream backgroundMusicPath = new FileInputStream(new File("Resources/background.mid"));
+//            AudioStream backgroundMusic = new AudioStream(backgroundMusicPath);
+//            AudioPlayer.player.start(backgroundMusic);
 
             gameEvents = new GameEvents();
-            gameEvents.addObserver(m);
+            gameEvents.addObserver(playerOne);
+            gameEvents.addObserver(playerTwo);
             KeyControl key = new KeyControl();
             addKeyListener(key);
         } catch (Exception e) {
             System.out.print("No resources are found");
-        }
-    }
-
-    public class GameEvents extends Observable {
-
-        int type;
-        Object event;
-
-        public void setValue(KeyEvent e) {
-            type = 1; // let's assume this means key input. 
-            //Should use CONSTANT value for this when you program
-            event = e;
-            setChanged();
-            // trigger notification
-            notifyObservers(this);
-        }
-
-        public void setValue(String msg) {
-            type = 2;
-            event = msg;
-            setChanged();
-            // trigger notification
-            notifyObservers(this);
-        }
-    }
-
-    public class KeyControl extends KeyAdapter {
-
-        public void keyPressed(KeyEvent e) {
-            gameEvents.setValue(e);
         }
     }
 
@@ -125,22 +105,30 @@ public class WingmanX extends JApplet implements Runnable {
         move += speed;
     }
 
-    public void drawDemo() {
+    public void drawGame() {
         drawBackGroundWithTileImage();
         I1.update();
         I2.update();
         I3.update();
-        for (int i = 0; i < enemies.size(); i++) {
-            enemies.get(i).update();
+        // update enemies
+        for (int i = 0; i < smallEnemies.size(); i++) {
+            smallEnemies.get(i).update();
         }
 
         I1.draw(this);
         I2.draw(this);
         I3.draw(this);
-        m.draw(this);
-        for (int i = 0; i < enemies.size(); i++) {
-            enemies.get(i).draw(this);
+        // draw players
+        playerOne.draw(this);
+        playerTwo.draw(this);
+        // draw enemies
+        for (int i = 0; i < smallEnemies.size(); i++) {
+            smallEnemies.get(i).draw(this);
         }
+        
+        //draw health bars
+        playerOneHealth.draw(this);
+        playerTwoHealth.draw(this);
     }
 
     public void paint(Graphics g) {
@@ -150,7 +138,7 @@ public class WingmanX extends JApplet implements Runnable {
                     windowSize.height);
             g2 = bimg.createGraphics();
         }
-        drawDemo();
+        drawGame();
         g.drawImage(bimg, 0, 0, this);
     }
 

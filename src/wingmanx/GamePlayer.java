@@ -22,10 +22,10 @@ public class GamePlayer implements Observer {
     int x, y, speed, width, height;
     Rectangle bbox;
     boolean boom;
-    int health;
     static int sensitivity = 15;
+    int playerNumber;
 
-    GamePlayer(Image img, int x, int y, int speed) {
+    GamePlayer(Image img, int x, int y, int speed, int pNum) {
         this.img = img;
         this.x = x;
         this.y = y;
@@ -33,7 +33,7 @@ public class GamePlayer implements Observer {
         width = img.getWidth(null);
         height = img.getHeight(null);
         boom = false;
-        health = 3;
+        this.playerNumber = pNum;
     }
 
     public void draw(ImageObserver obs) {
@@ -50,8 +50,8 @@ public class GamePlayer implements Observer {
     }
 
     public void update(Observable obj, Object arg) {
-        WingmanX.GameEvents ge = (WingmanX.GameEvents) arg;
-        if (ge.type == 1) {
+        GameEvents ge = (GameEvents) arg;
+        if (playerNumber == 1 && ge.type == 1) {
             KeyEvent e = (KeyEvent) ge.event;
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT:
@@ -67,16 +67,40 @@ public class GamePlayer implements Observer {
                     y += speed + sensitivity;
                     break;
                 default:
+                    if (e.getKeyChar() == '/') {
+                        System.out.println("Fire");
+                    }
+            }
+        } else if (playerNumber == 2 && ge.type == 1) {
+            KeyEvent e = (KeyEvent) ge.event;
+            switch (e.getKeyCode()) {
+                case KeyEvent.VK_A:
+                    x -= speed + sensitivity;
+                    break;
+                case KeyEvent.VK_D:
+                    x += speed + sensitivity;
+                    break;
+                case KeyEvent.VK_W:
+                    y -= speed + sensitivity;
+                    break;
+                case KeyEvent.VK_S:
+                    y += speed + sensitivity;
+                    break;
+                default:
                     if (e.getKeyChar() == ' ') {
                         System.out.println("Fire");
                     }
             }
         } else if (ge.type == 2) {
             String msg = (String) ge.event;
-            if (msg.equals("Explosion")) {
-                health--;
-                System.out.println("Got hit, player hp: " + health);
+            switch (msg) {
+                case "Explosion player 1":
+                    System.out.println("Player 1 hit!");
+                    break;
+                case "Explosion player 2":
+                    System.out.println("Player 2 hit!"); 
+                    break;
             }
-        }
+        } 
     }
 }
