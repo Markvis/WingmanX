@@ -16,6 +16,8 @@ public class gameTimerClass implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        
+        WingmanX.gameTimeCounter += 1;
 
         for (GameEnemy smallEnemies : WingmanX.smallEnemies) {
             if (smallEnemies.spawned == false) {
@@ -29,6 +31,11 @@ public class gameTimerClass implements ActionListener {
             if (smallEnemies.show == true && smallEnemies.spawned == true) {
                 smallEnemies.fire();
             }
+        }
+        
+        if(WingmanX.bossSpawned){
+            WingmanX.boss.spawned = true;
+            WingmanX.boss.show = true;
         }
     }
 }

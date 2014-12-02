@@ -24,7 +24,8 @@ public class GameEnemy {
     int x, y, sizeX, sizeY, speed;
     Random gen;
     boolean show, spawned;
-    int health;
+    int originalHealth;
+    int currentHealth;
 
     /**
      *
@@ -32,7 +33,7 @@ public class GameEnemy {
      * @param speed the speed of the enemy
      * @param gen random number generated of the spawn point
      */
-    GameEnemy(Image img, int speed, Random gen) {
+    GameEnemy(Image img, int speed, Random gen, int passedHealth) {
         this.img = img;
         this.x = Math.abs(gen.nextInt() % (600 - 30));
         this.y = -20;
@@ -40,6 +41,8 @@ public class GameEnemy {
         this.gen = gen;
         this.show = false;
         this.spawned = false;
+        this.originalHealth = passedHealth;
+        this.currentHealth = this.originalHealth;
         sizeX = img.getWidth(null);
         sizeY = img.getHeight(null);
         System.out.println("w:" + sizeX + " y:" + sizeY);
@@ -53,11 +56,14 @@ public class GameEnemy {
         // check if theres collision on the visible bullets
         for (GameBullets playerBullet : WingmanX.playerBullets) {
             if (playerBullet.collision(x, y, sizeX, sizeY) && playerBullet.show == true) {
-                show = false;
-                WingmanX.explosionSound2();
-                playerBullet.reset();
-                this.reset();
-                show = true;
+                this.currentHealth--;
+                if (currentHealth <= 0) {
+                    show = false;
+                    WingmanX.explosionSound2();
+                    playerBullet.reset();
+                    this.reset();
+                    show = true;
+                }
             }
         }
 
@@ -94,6 +100,7 @@ public class GameEnemy {
         this.spawned = false;
         this.x = Math.abs(WingmanX.generator.nextInt() % (600 - 30));
         this.y = -10;
+        this.currentHealth = this.originalHealth;
     }
 
     public void draw(ImageObserver obs) {

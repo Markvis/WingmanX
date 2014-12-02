@@ -50,6 +50,9 @@ public class WingmanX extends JApplet implements Runnable {
     static ArrayList<GameBullets> enemyBullets;
     static GameEnemy boss;
     Timer gameTimer;
+    static int gameTimeCounter;
+    static int gameScore;
+    static boolean bossSpawned;
 
     public void init() {
 
@@ -57,7 +60,9 @@ public class WingmanX extends JApplet implements Runnable {
         Image island1, island2, island3, smallEnemyImg;
 
         try {
+            bossSpawned = false;
             gameTimer = new Timer(1000, new gameTimerClass());
+            gameTimeCounter = 0;
             //sea = getSprite("Resources/water.png");
             sea = ImageIO.read(new File("Resources/water.png"));
             island1 = ImageIO.read(new File("Resources/island1.png"));
@@ -73,7 +78,7 @@ public class WingmanX extends JApplet implements Runnable {
             I1 = new GameIsland(island1, 100, 100, speed, generator);
             I2 = new GameIsland(island2, 200, 400, speed, generator);
             I3 = new GameIsland(island3, 300, 200, speed, generator);
-            
+
             // create array of player bullets
             playerBullets = new ArrayList<GameBullets>();
             for (int i = 0; i < 20; i++) {
@@ -84,22 +89,21 @@ public class WingmanX extends JApplet implements Runnable {
             for (int i = 0; i < 20; i++) {
                 enemyBullets.add(new GameBullets(enemyBullet, 4));
             }
-            
+
             // create 5 enemies
             smallEnemies = new ArrayList<GameEnemy>();
             for (int i = 0; i < 5; i++) {
-                smallEnemies.add(new GameEnemy(smallEnemyImg, 2, generator));
+                smallEnemies.add(new GameEnemy(smallEnemyImg, 2, generator, 1));
             }
-            
+
             // initialize boss
-//            boss = new GameEnemy(bossImg, 1, generator);
-//            boss.x = w/2 - 240/2;
-//            boss.show = true;
-//            boss.spawned = true;
-            
+            boss = new GameEnemy(bossImg, 1, generator, 50);
+            boss.x = w / 2 - 240 / 2;
+            boss.y = 0 - bossImg.getHeight(null);
+
             playerOne = new GamePlayer(playerOneImg, 200, 360, 5, 1);
             playerTwo = new GamePlayer(playerTwoImg, 400, 360, 5, 2);
-            
+
             playerOneHealth = new HealthBar(5, 420, 4);
             playerTwoHealth = new HealthBar(419, 420, 4);
 
@@ -107,36 +111,36 @@ public class WingmanX extends JApplet implements Runnable {
 //            InputStream backgroundMusicPath = new FileInputStream(new File("Resources/background.mid"));
 //            AudioStream backgroundMusic = new AudioStream(backgroundMusicPath);
 //            AudioPlayer.player.start(backgroundMusic);
-            
             gameEvents = new GameEvents();
             gameEvents.addObserver(playerOne);
             gameEvents.addObserver(playerTwo);
             KeyControl key = new KeyControl();
             addKeyListener(key);
-            
+
             gameTimer.start();
         } catch (Exception e) {
             System.out.print("No resources are found");
         }
     }
-    
-    public static void explosionSound1(){
+
+    public static void explosionSound1() {
         try {
             InputStream backgroundMusicPath = new FileInputStream(new File("Resources/snd_explosion1.wav"));
             AudioStream explosionSound = new AudioStream(backgroundMusicPath);
             AudioPlayer.player.start(explosionSound);
         } catch (Exception e) {
-            System.out.println("Error accessing explosion sound file");
-        } 
+            System.out.println("Error accessing explosionSound1() file");
+        }
     }
-    public static void explosionSound2(){
+
+    public static void explosionSound2() {
         try {
             InputStream backgroundMusicPath = new FileInputStream(new File("Resources/snd_explosion2.wav"));
             AudioStream explosionSound = new AudioStream(backgroundMusicPath);
             AudioPlayer.player.start(explosionSound);
         } catch (Exception e) {
-            System.out.println("Error accessing explosion sound file");
-        } 
+            System.out.println("Error accessing explosionSound2() file");
+        }
     }
 
     public void drawBackGroundWithTileImage() {
@@ -157,20 +161,27 @@ public class WingmanX extends JApplet implements Runnable {
     }
 
     public void drawGame() {
+        // spawns boss
+        if(gameTimeCounter == 10){
+            bossSpawned = true;
+            System.out.println("boss spawned");
+        }
+        
         drawBackGroundWithTileImage();
         I1.update();
         I2.update();
         I3.update();
+        
         // update enemies
         for (int i = 0; i < smallEnemies.size(); i++) {
             smallEnemies.get(i).update();
         }
-        
+
         // update player bullets
         for (int i = 0; i < playerBullets.size(); i++) {
             playerBullets.get(i).update();
         }
-        
+
         // update enemy bullets
         for (int i = 0; i < enemyBullets.size(); i++) {
             enemyBullets.get(i).update();
@@ -180,9 +191,12 @@ public class WingmanX extends JApplet implements Runnable {
         I1.draw(this);
         I2.draw(this);
         I3.draw(this);
-        
-        //boss.draw(this);
-        
+
+        if (bossSpawned) {
+            boss.update();
+            boss.draw(this);
+        }
+
         // draw fired player bullets
         for (int i = 0; i < playerBullets.size(); i++) {
             playerBullets.get(i).draw(this);
@@ -192,21 +206,22 @@ public class WingmanX extends JApplet implements Runnable {
         for (int i = 0; i < enemyBullets.size(); i++) {
             enemyBullets.get(i).draw(this);
         }
-        
+
         // draw enemies
         for (int i = 0; i < smallEnemies.size(); i++) {
             smallEnemies.get(i).draw(this);
         }
-        
+
         // draw players
         playerOne.draw(this);
         playerTwo.draw(this);
-        
+
         //draw health bars
         playerOneHealth.draw(this);
         playerTwoHealth.draw(this);
     }
 
+    @Override
     public void paint(Graphics g) {
         if (bimg == null) {
             Dimension windowSize = getSize();
@@ -218,6 +233,7 @@ public class WingmanX extends JApplet implements Runnable {
         g.drawImage(bimg, 0, 0, this);
     }
 
+    @Override
     public void start() {
         thread = new Thread(this);
         thread.setPriority(Thread.MIN_PRIORITY);
@@ -225,6 +241,7 @@ public class WingmanX extends JApplet implements Runnable {
         thread.start();
     }
 
+    @Override
     public void run() {
 
         Thread me = Thread.currentThread();
