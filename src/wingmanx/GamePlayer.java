@@ -12,6 +12,7 @@ import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import sun.audio.AudioPlayer;
@@ -23,26 +24,28 @@ import sun.audio.AudioStream;
  */
 public class GamePlayer implements Observer {
 
-    Image img;
     int x, y, speed, width, height;
     Rectangle bbox;
     boolean boom;
     static int sensitivity = 15;
     int playerNumber;
+    int imageIndex;
+    ArrayList <Image> imageArray;
 
-    GamePlayer(Image img, int x, int y, int speed, int pNum) {
-        this.img = img;
+    GamePlayer(ArrayList <Image> arrayOfImages, int x, int y, int speed, int pNum) {
         this.x = x;
         this.y = y;
         this.speed = speed;
-        width = img.getWidth(null);
-        height = img.getHeight(null);
+        this.imageArray = arrayOfImages;
+        this.imageIndex = 0;
+        width = imageArray.get(0).getWidth(null);
+        height = imageArray.get(0).getHeight(null);
         boom = false;
         this.playerNumber = pNum;
     }
 
     public void draw(ImageObserver obs) {
-        WingmanX.g2.drawImage(img, x, y, obs);
+        WingmanX.g2.drawImage(imageArray.get(imageIndex), x, y, obs);
     }
 
     public boolean collision(int x, int y, int w, int h) {
@@ -56,7 +59,15 @@ public class GamePlayer implements Observer {
 
     public void update(Observable obj, Object arg) {
         GameEvents ge = (GameEvents) arg;
-
+        
+        // update arraylist index
+        if(imageIndex == imageArray.size() - 1){
+            imageIndex = 0;
+        }
+        else {
+            imageIndex++;
+        }
+        
         for (int i = 0; i < WingmanX.enemyBullets.size(); i++) {
             if (WingmanX.enemyBullets.get(i).collision(x, y, width, height)
                     && WingmanX.enemyBullets.get(i).show == true) {
@@ -129,7 +140,8 @@ public class GamePlayer implements Observer {
                         System.out.println("player 2 Fire");
                     }
             }
-        } else if (ge.type == 2) {
+        } 
+        else if (ge.type == 2) {
             String msg = (String) ge.event;
             switch (msg) {
                 case "Explosion player 1":

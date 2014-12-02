@@ -53,7 +53,7 @@ public class HealthBar {
                 spareLives--;
             } else {
                 gameOver = true;
-                WingmanX.gameEvents.gameOver();
+                WingmanX.gameEvents.gameOver(1);
             }
         }
     }

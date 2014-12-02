@@ -10,7 +10,9 @@ import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Random;
+import javax.imageio.ImageIO;
 import sun.audio.AudioPlayer;
 import sun.audio.AudioStream;
 
@@ -20,12 +22,16 @@ import sun.audio.AudioStream;
  */
 public class GameEnemy {
 
-    Image img;
-    int x, y, sizeX, sizeY, speed;
+    int x, y, sizeX, sizeY, ySpeed, xSpeed;
     Random gen;
-    boolean show, spawned;
+    boolean show, spawned, boss;
     int originalHealth;
     int currentHealth;
+    int imageIndex;
+    ArrayList<Image> imageArray;
+    ArrayList<Image> explosionArray = new ArrayList<Image>();
+    boolean enteredFrame;
+    boolean moveToSides;
 
     /**
      *
@@ -33,37 +39,73 @@ public class GameEnemy {
      * @param speed the speed of the enemy
      * @param gen random number generated of the spawn point
      */
-    GameEnemy(Image img, int speed, Random gen, int passedHealth) {
-        this.img = img;
+    GameEnemy(ArrayList<Image> arrayOfImages, int speed, Random gen, int passedHealth) {
         this.x = Math.abs(gen.nextInt() % (600 - 30));
         this.y = -20;
-        this.speed = speed;
+        this.ySpeed = speed;
+        this.xSpeed = 1;
         this.gen = gen;
         this.show = false;
         this.spawned = false;
         this.originalHealth = passedHealth;
         this.currentHealth = this.originalHealth;
-        sizeX = img.getWidth(null);
-        sizeY = img.getHeight(null);
+        this.imageIndex = 0;
+        this.imageArray = arrayOfImages;
+        this.boss = false;
+        this.enteredFrame = false;
+        this.moveToSides = false;
+        sizeX = arrayOfImages.get(0).getWidth(null);
+        sizeY = arrayOfImages.get(0).getHeight(null);
         System.out.println("w:" + sizeX + " y:" + sizeY);
+
+        try {
+            explosionArray.add(ImageIO.read(new File("Resources/explosion1_1.png")));
+            explosionArray.add(ImageIO.read(new File("Resources/explosion1_2.png")));
+            explosionArray.add(ImageIO.read(new File("Resources/explosion1_3.png")));
+            explosionArray.add(ImageIO.read(new File("Resources/explosion1_4.png")));
+            explosionArray.add(ImageIO.read(new File("Resources/explosion1_5.png")));
+            explosionArray.add(ImageIO.read(new File("Resources/explosion1_6.png")));
+            explosionArray.add(ImageIO.read(new File("Resources/explosion1_7.png")));
+        } catch (Exception e) {
+            System.out.println("Error explosion file gameenemy.java");
+        }
     }
 
     public void update() {
+        if (currentHealth <= 0) {
+            show = false;
+            this.reset();
+            show = true;
+        }
+
         if (show && spawned) {
-            y += speed;
+            y += ySpeed;
+        }
+        
+        if(boss && y > WingmanX.h/4 || (y == 0 && boss && enteredFrame)){
+            enteredFrame = true;
+            moveToSides = true;
+            ySpeed *= -1;
+        }
+        if(boss && x > WingmanX.w-sizeX || (x == 0 && boss && enteredFrame)){
+            xSpeed *= -1;
+        }
+        if(enteredFrame){
+            x += xSpeed;
+        }
+
+        if (imageIndex == imageArray.size() - 1) {
+            imageIndex = 0;
+        } else {
+            imageIndex++;
         }
 
         // check if theres collision on the visible bullets
         for (GameBullets playerBullet : WingmanX.playerBullets) {
             if (playerBullet.collision(x, y, sizeX, sizeY) && playerBullet.show == true) {
                 this.currentHealth--;
-                if (currentHealth <= 0) {
-                    show = false;
-                    WingmanX.explosionSound2();
-                    playerBullet.reset();
-                    this.reset();
-                    show = true;
-                }
+                playerBullet.reset();
+                WingmanX.explosionSound2();
             }
         }
 
@@ -105,7 +147,7 @@ public class GameEnemy {
 
     public void draw(ImageObserver obs) {
         if (show && spawned) {
-            WingmanX.g2.drawImage(img, x, y, obs);
+            WingmanX.g2.drawImage(imageArray.get(imageIndex), x, y, obs);
         }
     }
 

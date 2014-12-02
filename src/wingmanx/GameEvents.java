@@ -34,9 +34,24 @@ public class GameEvents extends Observable {
         notifyObservers(this);
     }
     
-    public void gameOver(){
-        type = 3;
-        setChanged();
-        notifyObservers(this);
+    /**
+     * 
+     * @param status if status is 1, its gameover, if status is 2 then its a win
+     */
+
+    public void gameOver(int status) {
+        if (status == 0) {
+            type = 3;
+            event = "You Lose";
+            setChanged();
+            notifyObservers(this);
+        } else if (status == 1) {
+            type = 4;
+            event = "You Win";
+            setChanged();
+            notifyObservers(this);
+        } else {
+            System.out.println("invalid gameover Status");
+        }
     }
 }
