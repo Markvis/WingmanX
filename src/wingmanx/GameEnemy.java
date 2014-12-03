@@ -29,7 +29,6 @@ public class GameEnemy {
     int currentHealth;
     int imageIndex;
     ArrayList<Image> imageArray;
-    ArrayList<Image> explosionArray = new ArrayList<Image>();
     boolean enteredFrame, whiteEnemy;
 
     /**
@@ -55,40 +54,30 @@ public class GameEnemy {
         this.whiteEnemy = false;
         sizeX = arrayOfImages.get(0).getWidth(null);
         sizeY = arrayOfImages.get(0).getHeight(null);
-        System.out.println("w:" + sizeX + " y:" + sizeY);
-
-        try {
-            explosionArray.add(ImageIO.read(new File("Resources/explosion1_1.png")));
-            explosionArray.add(ImageIO.read(new File("Resources/explosion1_2.png")));
-            explosionArray.add(ImageIO.read(new File("Resources/explosion1_3.png")));
-            explosionArray.add(ImageIO.read(new File("Resources/explosion1_4.png")));
-            explosionArray.add(ImageIO.read(new File("Resources/explosion1_5.png")));
-            explosionArray.add(ImageIO.read(new File("Resources/explosion1_6.png")));
-            explosionArray.add(ImageIO.read(new File("Resources/explosion1_7.png")));
-        } catch (Exception e) {
-            System.out.println("Error explosion file gameenemy.java");
-        }
+        System.out.println("enemy spawned: w:" + sizeX + " y:" + sizeY);
     }
 
     public void update() {
         if (currentHealth <= 0) {
             show = false;
-            this.reset();
+            if(!boss){
+                this.reset();
+            }
             show = true;
         }
 
         if (show && spawned) {
             y += ySpeed;
         }
-        
-        if(boss && y > WingmanX.h/2 - sizeY*3/4 || (y == 0 && boss && enteredFrame)){
+
+        if (boss && y > WingmanX.h / 2 - sizeY * 3 / 4 || (y == 0 && boss && enteredFrame)) {
             enteredFrame = true;
             ySpeed *= -1;
         }
-        if(boss && x > WingmanX.w-sizeX || (x == 0 && boss && enteredFrame)){
+        if (boss && x > WingmanX.w - sizeX || (x == 0 && boss && enteredFrame)) {
             xSpeed *= -1;
         }
-        if(enteredFrame || whiteEnemy){
+        if (enteredFrame || whiteEnemy) {
             x += xSpeed;
         }
 
@@ -103,8 +92,11 @@ public class GameEnemy {
             if (playerBullet.collision(x, y, sizeX, sizeY) && playerBullet.show == true) {
                 this.currentHealth--;
                 playerBullet.reset();
-                WingmanX.explosionSound2();
-                WingmanX.gameScore += 10;
+                if (currentHealth == 0) {
+                    WingmanX.explosionSound2();
+                    WingmanX.explodeAnimation1(this.x + this.sizeX / 2, this.y + this.sizeY / 2);
+                    WingmanX.gameScore += 10;
+                }
             }
         }
 
@@ -140,12 +132,12 @@ public class GameEnemy {
         this.show = false;
         this.spawned = false;
         this.x = Math.abs(WingmanX.generator.nextInt() % (600 - 30));
-        if(whiteEnemy){
-            if(x < WingmanX.w/2){
+        if (whiteEnemy) {
+            if (x < WingmanX.w / 2) {
                 xSpeed = 1;
-            }
-            else 
+            } else {
                 xSpeed = -1;
+            }
         }
         this.y = -10;
         this.currentHealth = this.originalHealth;

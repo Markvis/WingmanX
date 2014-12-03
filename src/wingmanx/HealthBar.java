@@ -54,6 +54,7 @@ public class HealthBar {
             } else {
                 gameOver = true;
                 WingmanX.gameEvents.gameOver(1);
+                WingmanX.gameOver = 2;
             }
         }
     }

@@ -20,9 +20,9 @@ public class GameExplosion {
     boolean visible;
     ArrayList <Image> imageArray;
 
-    GameExplosion(ArrayList <Image> imageArray, int x, int y) {
-        this.x = x;
-        this.y = y;
+    GameExplosion(ArrayList <Image> imageArray) {
+        this.x = 0;
+        this.y = 0;
         this.visible = false;
         this.imageArray = imageArray;
         this.imageIndex = 0;
@@ -31,7 +31,13 @@ public class GameExplosion {
     }
     
     public void update(){
-        
+        if(visible){
+            this.imageIndex++;
+            if(this.imageIndex >= imageArray.size()){
+                visible = false;
+                imageIndex = 0;
+            }
+        }
     }
     
     public void draw(ImageObserver obs){
