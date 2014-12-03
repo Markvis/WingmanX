@@ -43,18 +43,24 @@ public class GameTimerClass implements ActionListener {
                     smallGreenEnemies.fire();
                 }
             }
-            
-            if(WingmanX.gameTimeCounter > 6){
+
+            if (WingmanX.gameTimeCounter > 6) {
                 for (GameEnemy smallWhiteEnemies : WingmanX.smallWhiteEnemies) {
-                if (smallWhiteEnemies.show == true && smallWhiteEnemies.spawned == true) {
-                    smallWhiteEnemies.fire();
+                    if (smallWhiteEnemies.show == true && smallWhiteEnemies.spawned == true) {
+                        smallWhiteEnemies.fire();
+                    }
                 }
-            }
             }
 
             if (WingmanX.bossSpawned) {
                 WingmanX.boss.spawned = true;
                 WingmanX.boss.show = true;
+            }
+
+            if (WingmanX.powerUpSpawned == false && WingmanX.gameTimeCounter == 10
+                    || WingmanX.gameTimeCounter % 10 == 0) {
+                WingmanX.powerUpSpawned = true;
+                WingmanX.invinciblePower.get(0).visible = true;
             }
         }
     }

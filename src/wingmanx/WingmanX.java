@@ -54,6 +54,7 @@ public class WingmanX extends JApplet implements Runnable {
     static int gameScore;
     static boolean bossSpawned;
     static boolean gameStart = false;
+    static boolean powerUpSpawned = false;
     // if 1 = win, 2 = lose
     static int gameOver = 0;
 
@@ -69,6 +70,7 @@ public class WingmanX extends JApplet implements Runnable {
     static ArrayList<GameEnemy> smallGreenEnemies;
     static ArrayList<GameEnemy> smallWhiteEnemies;
     static ArrayList<GameExplosion> smallExplosions;
+    static ArrayList<GamePowerUps> invinciblePower;
 
     // sprites
     ArrayList<Image> enemyGreenSprite = new ArrayList<>();
@@ -76,6 +78,7 @@ public class WingmanX extends JApplet implements Runnable {
     ArrayList<Image> bossSprite = new ArrayList<>();
     ArrayList<Image> playerSprite = new ArrayList<>();
     ArrayList<Image> smallExplosionSprite = new ArrayList<>();
+    ArrayList<Image> invinciblePowerSprite = new ArrayList<>();
 
     @Override
     public void init() {
@@ -159,6 +162,13 @@ public class WingmanX extends JApplet implements Runnable {
                     temp.xSpeed = -1;
                 }
                 smallWhiteEnemies.add(temp);
+            }
+
+            // create only 1 power up
+            invinciblePowerSprite.add(ImageIO.read(new File("Resources/powerup.png")));
+            invinciblePower = new ArrayList<>();
+            for (int i = 0; i < 1; i++) {
+                invinciblePower.add(new GamePowerUps(invinciblePowerSprite,generator));
             }
 
             // initialize boss
@@ -264,25 +274,29 @@ public class WingmanX extends JApplet implements Runnable {
 
         if (gameStart == false && gameOver == 0) {
             // draw loading
-            g2.drawImage(loadingScreen, w/2 - loadingScreen.getWidth(null)/2,
-                    h/2 - loadingScreen.getHeight(null)/2, null);
+            g2.drawImage(loadingScreen, w / 2 - loadingScreen.getWidth(null) / 2,
+                    h / 2 - loadingScreen.getHeight(null) / 2, null);
         }
-        if (gameOver == 1){
+        if (gameOver == 1) {
             // draw you win
-            g2.drawImage(gameOverWon, w/2 - gameOverWon.getWidth(null)/2,
-                    h/2 - gameOverWon.getHeight(null)/2, null);
-        }
-        else if(gameOver == 2){
+            g2.drawImage(gameOverWon, w / 2 - gameOverWon.getWidth(null) / 2,
+                    h / 2 - gameOverWon.getHeight(null) / 2, null);
+        } else if (gameOver == 2) {
             // draw lose
-            g2.drawImage(gameOverLost, w/2 - gameOverLost.getWidth(null)/2,
-                    h/2 - gameOverLost.getHeight(null)/2, null);
+            g2.drawImage(gameOverLost, w / 2 - gameOverLost.getWidth(null) / 2,
+                    h / 2 - gameOverLost.getHeight(null) / 2, null);
         }
 
         if (gameStart == true && gameOver == 0) {
             // spawns boss
-            if (gameTimeCounter == 15) {
+            if (gameTimeCounter == 20) {
                 bossSpawned = true;
                 System.out.println("boss spawned");
+            }
+            
+            if(powerUpSpawned){
+                invinciblePower.get(0).update();
+                invinciblePower.get(0).draw(this);
             }
 
             // update explosion objects
@@ -326,7 +340,7 @@ public class WingmanX extends JApplet implements Runnable {
             for (int i = 0; i < smallExplosions.size(); i++) {
                 smallExplosions.get(i).draw(this);
             }
-            
+
             // draw fired player bullets
             for (int i = 0; i < playerBullets.size(); i++) {
                 playerBullets.get(i).draw(this);

@@ -20,11 +20,11 @@ public class GameExplosion {
     boolean visible;
     ArrayList <Image> imageArray;
 
-    GameExplosion(ArrayList <Image> imageArray) {
+    GameExplosion(ArrayList <Image> sprite) {
         this.x = 0;
         this.y = 0;
         this.visible = false;
-        this.imageArray = imageArray;
+        this.imageArray = sprite;
         this.imageIndex = 0;
         this.imageWidth = this.imageArray.get(0).getWidth(null);
         this.imageHeight = this.imageArray.get(0).getHeight(null);

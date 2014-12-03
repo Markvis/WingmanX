@@ -24,23 +24,22 @@ import sun.audio.AudioStream;
  */
 public class GamePlayer implements Observer {
 
-    int x, y, speed, width, height;
+    int x, y, speed, width, height, power;
     Rectangle bbox;
-    boolean boom;
     static int sensitivity = 15;
     int playerNumber;
     int imageIndex;
-    ArrayList <Image> imageArray;
+    ArrayList<Image> imageArray;
 
-    GamePlayer(ArrayList <Image> arrayOfImages, int x, int y, int speed, int pNum) {
+    GamePlayer(ArrayList<Image> arrayOfImages, int x, int y, int speed, int pNum) {
         this.x = x;
         this.y = y;
         this.speed = speed;
         this.imageArray = arrayOfImages;
         this.imageIndex = 0;
+        this.power = 0;
         width = imageArray.get(0).getWidth(null);
         height = imageArray.get(0).getHeight(null);
-        boom = false;
         this.playerNumber = pNum;
     }
 
@@ -59,26 +58,28 @@ public class GamePlayer implements Observer {
 
     public void update(Observable obj, Object arg) {
         GameEvents ge = (GameEvents) arg;
-        
+
         // update arraylist index
-        if(imageIndex == imageArray.size() - 1){
+        if (imageIndex == imageArray.size() - 1) {
             imageIndex = 0;
-        }
-        else {
+        } else {
             imageIndex++;
         }
-        
+
         for (int i = 0; i < WingmanX.enemyBullets.size(); i++) {
             if (WingmanX.enemyBullets.get(i).collision(x, y, width, height)
                     && WingmanX.enemyBullets.get(i).show == true) {
-                if (this.playerNumber == 1) {
+                if (this.playerNumber == 1 && power == 0) {
                     WingmanX.playerOneHealth.update();
+                    WingmanX.explosionSound1();
+                    WingmanX.enemyBullets.get(i).reset();
                 }
-                if (this.playerNumber == 2) {
+                if (this.playerNumber == 2 && power == 0) {
                     WingmanX.playerTwoHealth.update();
+                    WingmanX.explosionSound1();
+                    WingmanX.enemyBullets.get(i).reset();
                 }
-                WingmanX.explosionSound1();
-                WingmanX.enemyBullets.get(i).reset();
+
             }
         }
 
@@ -140,8 +141,7 @@ public class GamePlayer implements Observer {
                         System.out.println("player 2 Fire");
                     }
             }
-        } 
-        else if (ge.type == 2) {
+        } else if (ge.type == 2) {
             String msg = (String) ge.event;
             switch (msg) {
                 case "Explosion player 1":
