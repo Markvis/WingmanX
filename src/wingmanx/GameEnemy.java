@@ -30,8 +30,7 @@ public class GameEnemy {
     int imageIndex;
     ArrayList<Image> imageArray;
     ArrayList<Image> explosionArray = new ArrayList<Image>();
-    boolean enteredFrame;
-    boolean moveToSides;
+    boolean enteredFrame, whiteEnemy;
 
     /**
      *
@@ -53,7 +52,7 @@ public class GameEnemy {
         this.imageArray = arrayOfImages;
         this.boss = false;
         this.enteredFrame = false;
-        this.moveToSides = false;
+        this.whiteEnemy = false;
         sizeX = arrayOfImages.get(0).getWidth(null);
         sizeY = arrayOfImages.get(0).getHeight(null);
         System.out.println("w:" + sizeX + " y:" + sizeY);
@@ -82,15 +81,14 @@ public class GameEnemy {
             y += ySpeed;
         }
         
-        if(boss && y > WingmanX.h/4 || (y == 0 && boss && enteredFrame)){
+        if(boss && y > WingmanX.h/2 - sizeY*3/4 || (y == 0 && boss && enteredFrame)){
             enteredFrame = true;
-            moveToSides = true;
             ySpeed *= -1;
         }
         if(boss && x > WingmanX.w-sizeX || (x == 0 && boss && enteredFrame)){
             xSpeed *= -1;
         }
-        if(enteredFrame){
+        if(enteredFrame || whiteEnemy){
             x += xSpeed;
         }
 
@@ -106,6 +104,7 @@ public class GameEnemy {
                 this.currentHealth--;
                 playerBullet.reset();
                 WingmanX.explosionSound2();
+                WingmanX.gameScore += 10;
             }
         }
 
@@ -141,6 +140,13 @@ public class GameEnemy {
         this.show = false;
         this.spawned = false;
         this.x = Math.abs(WingmanX.generator.nextInt() % (600 - 30));
+        if(whiteEnemy){
+            if(x < WingmanX.w/2){
+                xSpeed = 1;
+            }
+            else 
+                xSpeed = -1;
+        }
         this.y = -10;
         this.currentHealth = this.originalHealth;
     }

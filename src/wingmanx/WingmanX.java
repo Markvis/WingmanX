@@ -30,26 +30,22 @@ import javax.sound.sampled.AudioSystem;
 public class WingmanX extends JApplet implements Runnable {
 
     private Thread thread;
+
+    // Images
     Image sea;
     Image playerOneImg;
     Image playerTwoImg;
     Image playerBullet;
     Image enemyBullet;
     Image loadingScreen;
+
     private BufferedImage bimg;
     static Graphics2D g2;
     int speed = 1, move = 0;
     static Random generator = new Random();
     GameIsland I1, I2, I3;
-    static GamePlayer playerOne;
-    static GamePlayer playerTwo;
     static final int w = 640, h = 480; // fixed size window game 
     static GameEvents gameEvents;
-    static ArrayList<GameEnemy> smallEnemies;
-    static HealthBar playerOneHealth;
-    static HealthBar playerTwoHealth;
-    static ArrayList<GameBullets> playerBullets;
-    static ArrayList<GameBullets> enemyBullets;
     static GameEnemy boss;
     Timer gameTimer;
     static int gameTimeCounter;
@@ -57,8 +53,21 @@ public class WingmanX extends JApplet implements Runnable {
     static boolean bossSpawned;
     static boolean gameStart = false;
 
+    // player
+    static GamePlayer playerOne;
+    static GamePlayer playerTwo;
+    static HealthBar playerOneHealth;
+    static HealthBar playerTwoHealth;
+
+    // containers
+    static ArrayList<GameBullets> playerBullets;
+    static ArrayList<GameBullets> enemyBullets;
+    static ArrayList<GameEnemy> smallGreenEnemies;
+    static ArrayList<GameEnemy> smallWhiteEnemies;
+
     // sprites
-    ArrayList<Image> enemySprite = new ArrayList<Image>();
+    ArrayList<Image> enemyGreenSprite = new ArrayList<Image>();
+    ArrayList<Image> enemyWhiteSprite = new ArrayList<Image>();
     ArrayList<Image> bossSprite = new ArrayList<Image>();
     ArrayList<Image> playerSprite = new ArrayList<Image>();
 
@@ -79,15 +88,21 @@ public class WingmanX extends JApplet implements Runnable {
             enemyBullet = ImageIO.read(new File("Resources/enemybullet1.png"));
             loadingScreen = ImageIO.read(new File("Resources/loading.gif"));
 
-            enemySprite.add(ImageIO.read(new File("Resources/enemy1_1.png")));
-            enemySprite.add(ImageIO.read(new File("Resources/enemy1_2.png")));
-            enemySprite.add(ImageIO.read(new File("Resources/enemy1_3.png")));
+            enemyGreenSprite.add(ImageIO.read(new File("Resources/enemy1_1.png")));
+            enemyGreenSprite.add(ImageIO.read(new File("Resources/enemy1_2.png")));
+            enemyGreenSprite.add(ImageIO.read(new File("Resources/enemy1_3.png")));
+
+            enemyWhiteSprite.add(ImageIO.read(new File("Resources/enemy3_1.png")));
+            enemyWhiteSprite.add(ImageIO.read(new File("Resources/enemy3_2.png")));
+            enemyWhiteSprite.add(ImageIO.read(new File("Resources/enemy3_3.png")));
 
             playerSprite.add(ImageIO.read(new File("Resources/myplane_1.png")));
             playerSprite.add(ImageIO.read(new File("Resources/myplane_2.png")));
             playerSprite.add(ImageIO.read(new File("Resources/myplane_3.png")));
 
-            bossSprite.add(ImageIO.read(new File("Resources/boss.png")));
+            bossSprite.add(ImageIO.read(new File("Resources/raiden1.png")));
+            bossSprite.add(ImageIO.read(new File("Resources/raiden2.png")));
+            bossSprite.add(ImageIO.read(new File("Resources/raiden3.png")));
 
             I1 = new GameIsland(island1, 100, 100, speed, generator);
             I2 = new GameIsland(island2, 200, 400, speed, generator);
@@ -104,15 +119,28 @@ public class WingmanX extends JApplet implements Runnable {
                 enemyBullets.add(new GameBullets(enemyBullet, 4));
             }
 
-            // create 5 enemies
-            smallEnemies = new ArrayList<GameEnemy>();
-            for (int i = 0; i < 3; i++) {
-                smallEnemies.add(new GameEnemy(enemySprite, 2, generator, 1));
+            // create 3 green enemies
+            smallGreenEnemies = new ArrayList<GameEnemy>();
+            for (int i = 0; i < 2; i++) {
+                smallGreenEnemies.add(new GameEnemy(enemyGreenSprite, 2, generator, 1));
+            }
+
+            // create 3 blue enemies
+            smallWhiteEnemies = new ArrayList<GameEnemy>();
+            for (int i = 0; i < 2; i++) {
+                GameEnemy temp = new GameEnemy(enemyWhiteSprite, 3, generator, 1);
+                temp.whiteEnemy = true;
+                if (temp.x < WingmanX.w / 2) {
+                    temp.xSpeed = 1;
+                } else {
+                    temp.xSpeed = -1;
+                }
+                smallWhiteEnemies.add(temp);
             }
 
             // initialize boss
             boss = new GameEnemy(bossSprite, 1, generator, 25);
-            boss.x = w / 2 - 240 / 2;
+            boss.x = w/2 - boss.sizeX/2;
             boss.y = 0 - bossSprite.get(0).getHeight(null);
             boss.boss = true;
 
@@ -186,28 +214,39 @@ public class WingmanX extends JApplet implements Runnable {
         I1.draw(this);
         I2.draw(this);
         I3.draw(this);
-        
-        if(gameEvents.type == 1){
+
+        if (gameEvents.type == 1) {
             KeyEvent e = (KeyEvent) gameEvents.event;
-            if(e.getKeyCode() == KeyEvent.VK_ENTER){
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                 gameStart = true;
             }
         }
-        
-        if(WingmanX.gameStart == false){
-            g2.drawImage(loadingScreen, w/3-40, h/3, null);
+        if (gameEvents.type == 1) {
+            KeyEvent e = (KeyEvent) gameEvents.event;
+            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+
+            }
+        }
+
+        if (WingmanX.gameStart == false) {
+            g2.drawImage(loadingScreen, w / 3 - 40, h / 3, null);
         }
 
         if (WingmanX.gameStart == true) {
             // spawns boss
-            if (gameTimeCounter == 10) {
+            if (gameTimeCounter == 15) {
                 bossSpawned = true;
                 System.out.println("boss spawned");
             }
 
-            // update enemies
-            for (int i = 0; i < smallEnemies.size(); i++) {
-                smallEnemies.get(i).update();
+            // update green enemies
+            for (int i = 0; i < smallGreenEnemies.size(); i++) {
+                smallGreenEnemies.get(i).update();
+            }
+
+            // update white enemies
+            for (int i = 0; i < smallWhiteEnemies.size(); i++) {
+                smallWhiteEnemies.get(i).update();
             }
 
             // update player bullets
@@ -239,9 +278,14 @@ public class WingmanX extends JApplet implements Runnable {
                 enemyBullets.get(i).draw(this);
             }
 
-            // draw enemies
-            for (int i = 0; i < smallEnemies.size(); i++) {
-                smallEnemies.get(i).draw(this);
+            // draw white enemies
+            for (int i = 0; i < smallWhiteEnemies.size(); i++) {
+                smallWhiteEnemies.get(i).draw(this);
+            }
+
+            // draw green enemies
+            for (int i = 0; i < smallGreenEnemies.size(); i++) {
+                smallGreenEnemies.get(i).draw(this);
             }
 
             // draw players

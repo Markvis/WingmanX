@@ -20,18 +20,36 @@ public class GameTimerClass implements ActionListener {
         if (WingmanX.gameStart == true) {
             WingmanX.gameTimeCounter += 1;
 
-            for (GameEnemy smallEnemies : WingmanX.smallEnemies) {
-                if (smallEnemies.spawned == false) {
-                    smallEnemies.spawned = true;
-                    smallEnemies.show = true;
+            for (GameEnemy smallGreenEnemies : WingmanX.smallGreenEnemies) {
+                if (smallGreenEnemies.spawned == false) {
+                    smallGreenEnemies.spawned = true;
+                    smallGreenEnemies.show = true;
                     break;
                 }
             }
 
-            for (GameEnemy smallEnemies : WingmanX.smallEnemies) {
-                if (smallEnemies.show == true && smallEnemies.spawned == true) {
-                    smallEnemies.fire();
+            if (WingmanX.gameTimeCounter > 5) {
+                for (GameEnemy smallWhiteEnemies : WingmanX.smallWhiteEnemies) {
+                    if (smallWhiteEnemies.spawned == false) {
+                        smallWhiteEnemies.spawned = true;
+                        smallWhiteEnemies.show = true;
+                        break;
+                    }
                 }
+            }
+
+            for (GameEnemy smallGreenEnemies : WingmanX.smallGreenEnemies) {
+                if (smallGreenEnemies.show == true && smallGreenEnemies.spawned == true) {
+                    smallGreenEnemies.fire();
+                }
+            }
+            
+            if(WingmanX.gameTimeCounter > 6){
+                for (GameEnemy smallWhiteEnemies : WingmanX.smallWhiteEnemies) {
+                if (smallWhiteEnemies.show == true && smallWhiteEnemies.spawned == true) {
+                    smallWhiteEnemies.fire();
+                }
+            }
             }
 
             if (WingmanX.bossSpawned) {
