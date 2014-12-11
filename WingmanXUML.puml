@@ -1,0 +1,108 @@
+@startuml
+annotation java.lang.Override
+class java.awt.Image
+class java.awt.Rectangle
+class java.awt.event.ActionEvent
+class java.awt.event.KeyAdapter
+class java.awt.event.KeyEvent
+class java.awt.image.ImageObserver
+class java.io.File
+class java.io.FileInputStream
+class java.io.InputStream
+class java.net.URL
+class java.util.ArrayList
+class java.util.LinkedList
+class java.util.ListIterator
+class java.util.Observable
+class java.util.Random
+class javax.imageio.ImageIO
+class javax.sound.sampled.AudioInputStream
+class javax.sound.sampled.AudioSystem
+class javax.swing.Timer
+class sun.audio.AudioPlayer
+class sun.audio.AudioStream
+class wingmanx.GameBullets
+class wingmanx.GameEnemy
+class wingmanx.GameEvents
+class wingmanx.GameExplosion
+class wingmanx.GameIsland
+class wingmanx.GamePlayer
+class wingmanx.GamePowerUps
+class wingmanx.GameTimerClass
+class wingmanx.HealthBar
+class wingmanx.JApplet
+class wingmanx.KeyControl
+class wingmanx.WingmanX
+interface java.awt.event.ActionListener
+interface java.lang.Runnable
+interface java.util.Observer
+wingmanx.GameBullets ..> java.awt.Image
+wingmanx.GameBullets ..> java.awt.Rectangle
+wingmanx.GameBullets ..> java.awt.image.ImageObserver
+wingmanx.GameBullets ..> java.util.Random
+wingmanx.GameEnemy ..> java.awt.Image
+wingmanx.GameEnemy ..> java.awt.image.ImageObserver
+wingmanx.GameEnemy ..> java.io.File
+wingmanx.GameEnemy ..> java.io.FileInputStream
+wingmanx.GameEnemy ..> java.io.InputStream
+wingmanx.GameEnemy ..> java.util.ArrayList
+wingmanx.GameEnemy ..> java.util.Random
+wingmanx.GameEnemy ..> javax.imageio.ImageIO
+wingmanx.GameEnemy ..> sun.audio.AudioPlayer
+wingmanx.GameEnemy ..> sun.audio.AudioStream
+wingmanx.GameEvents ..> java.awt.event.KeyEvent
+wingmanx.GameEvents --|> java.util.Observable
+wingmanx.GameExplosion ..> java.awt.Image
+wingmanx.GameExplosion ..> java.awt.image.ImageObserver
+wingmanx.GameExplosion ..> java.util.ArrayList
+wingmanx.GameIsland ..> java.awt.Image
+wingmanx.GameIsland ..> java.awt.image.ImageObserver
+wingmanx.GameIsland ..> java.util.Random
+wingmanx.GamePlayer ..> java.awt.Image
+wingmanx.GamePlayer ..> java.awt.Rectangle
+wingmanx.GamePlayer ..> java.awt.event.KeyEvent
+wingmanx.GamePlayer ..> java.awt.image.ImageObserver
+wingmanx.GamePlayer ..> java.io.File
+wingmanx.GamePlayer ..> java.io.FileInputStream
+wingmanx.GamePlayer ..> java.io.InputStream
+wingmanx.GamePlayer ..> java.util.ArrayList
+wingmanx.GamePlayer ..> java.util.Observable
+wingmanx.GamePlayer ..> sun.audio.AudioPlayer
+wingmanx.GamePlayer ..> sun.audio.AudioStream
+wingmanx.GamePlayer --|> java.util.Observer
+wingmanx.GamePowerUps ..> java.awt.Image
+wingmanx.GamePowerUps ..> java.awt.image.ImageObserver
+wingmanx.GamePowerUps ..> java.util.ArrayList
+wingmanx.GamePowerUps ..> java.util.Random
+wingmanx.GameTimerClass ..> java.lang.Override
+wingmanx.GameTimerClass ..> java.awt.event.ActionEvent
+wingmanx.GameTimerClass --|> java.awt.event.ActionListener
+wingmanx.HealthBar ..> java.awt.Image
+wingmanx.HealthBar ..> java.awt.image.ImageObserver
+wingmanx.HealthBar ..> java.io.File
+wingmanx.HealthBar ..> java.util.Random
+wingmanx.HealthBar ..> javax.imageio.ImageIO
+wingmanx.KeyControl --|> java.awt.event.KeyAdapter
+wingmanx.KeyControl ..> java.awt.event.KeyEvent
+wingmanx.WingmanX ..> java.lang.Override
+wingmanx.WingmanX ..> java.awt.event.ActionEvent
+wingmanx.WingmanX ..> java.io.File
+wingmanx.WingmanX ..> java.io.FileInputStream
+wingmanx.WingmanX ..> java.io.InputStream
+wingmanx.WingmanX ..> java.net.URL
+wingmanx.WingmanX ..> java.util.ArrayList
+wingmanx.WingmanX ..> java.util.LinkedList
+wingmanx.WingmanX ..> java.util.ListIterator
+wingmanx.WingmanX ..> java.util.Observable
+wingmanx.WingmanX ..> java.util.Random
+wingmanx.WingmanX ..> javax.imageio.ImageIO
+wingmanx.WingmanX ..> javax.sound.sampled.AudioInputStream
+wingmanx.WingmanX ..> javax.sound.sampled.AudioSystem
+wingmanx.WingmanX ..> javax.swing.Timer
+wingmanx.WingmanX ..> sun.audio.AudioPlayer
+wingmanx.WingmanX ..> sun.audio.AudioStream
+wingmanx.WingmanX --|> wingmanx.JApplet
+wingmanx.WingmanX ..> java.awt.event.ActionListener
+wingmanx.WingmanX --|> java.lang.Runnable
+wingmanx.WingmanX ..> java.util.Observer
+@enduml

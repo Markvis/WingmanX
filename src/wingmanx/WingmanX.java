@@ -168,11 +168,11 @@ public class WingmanX extends JApplet implements Runnable {
             invinciblePowerSprite.add(ImageIO.read(new File("Resources/powerup.png")));
             invinciblePower = new ArrayList<>();
             for (int i = 0; i < 1; i++) {
-                invinciblePower.add(new GamePowerUps(invinciblePowerSprite,generator));
+                invinciblePower.add(new GamePowerUps(invinciblePowerSprite, generator));
             }
 
             // initialize boss
-            boss = new GameEnemy(bossSprite, 1, generator, 25);
+            boss = new GameEnemy(bossSprite, 1, generator, 35);
             boss.x = w / 2 - boss.sizeX / 2;
             boss.y = 0 - bossSprite.get(0).getHeight(null);
             boss.boss = true;
@@ -265,10 +265,10 @@ public class WingmanX extends JApplet implements Runnable {
                 gameStart = true;
             }
         }
-        if (gameEvents.type == 1) {
+        if (gameEvents.type == 1 && gameOver > 0) {
             KeyEvent e = (KeyEvent) gameEvents.event;
             if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-
+                System.exit(0);
             }
         }
 
@@ -293,8 +293,8 @@ public class WingmanX extends JApplet implements Runnable {
                 bossSpawned = true;
                 System.out.println("boss spawned");
             }
-            
-            if(powerUpSpawned){
+
+            if (powerUpSpawned) {
                 invinciblePower.get(0).update();
                 invinciblePower.get(0).draw(this);
             }
